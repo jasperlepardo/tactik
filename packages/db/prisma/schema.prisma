@@ -1,0 +1,164 @@
+// Tactik CPQ data model — mirrors §6 of docs/prd/cpq-module.md.
+// Money is stored as integer minor units (cents). See PRD §5.4.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductType {
+  one_time
+  recurring
+  usage
+}
+
+enum BillingPeriod {
+  monthly
+  quarterly
+  annual
+}
+
+enum DiscountType {
+  percent
+  fixed
+}
+
+enum QuoteStatus {
+  draft
+  pending_approval
+  approved
+  sent
+  accepted
+  rejected
+  expired
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+model Account {
+  id          String   @id @default(cuid())
+  name        String
+  externalRef String?
+  createdAt   DateTime @default(now())
+  quotes      Quote[]
+}
+
+model Product {
+  id            String          @id @default(cuid())
+  name          String
+  sku           String          @unique
+  description   String?
+  type          ProductType
+  billingPeriod BillingPeriod?
+  unitLabel     String?
+  active        Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  priceEntries  PriceBookEntry[]
+  lineItems     QuoteLineItem[]
+}
+
+model PriceBook {
+  id        String           @id @default(cuid())
+  name      String
+  currency  String           @default("USD")
+  isDefault Boolean          @default(false)
+  entries   PriceBookEntry[]
+}
+
+model PriceBookEntry {
+  id          String    @id @default(cuid())
+  priceBook   PriceBook @relation(fields: [priceBookId], references: [id])
+  priceBookId String
+  product     Product   @relation(fields: [productId], references: [id])
+  productId   String
+  listPrice   Int // minor units
+
+  @@unique([priceBookId, productId])
+}
+
+model Quote {
+  id            String          @id @default(cuid())
+  account       Account         @relation(fields: [accountId], references: [id])
+  accountId     String
+  ownerId       String
+  status        QuoteStatus     @default(draft)
+  version       Int             @default(1)
+  parentQuoteId String?
+  currency      String          @default("USD")
+  validUntil    DateTime?
+  terms         String?
+  subtotal      Int             @default(0)
+  discountTotal Int             @default(0)
+  grandTotal    Int             @default(0)
+  createdAt     DateTime        @default(now())
+  sentAt        DateTime?
+  lineItems     QuoteLineItem[]
+  approvals     ApprovalRequest[]
+  auditEvents   AuditEvent[]
+
+  @@index([accountId])
+  @@index([ownerId, status])
+}
+
+model QuoteLineItem {
+  id            String       @id @default(cuid())
+  quote         Quote        @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  quoteId       String
+  product       Product      @relation(fields: [productId], references: [id])
+  productId     String
+  nameSnapshot  String
+  qty           Int
+  unitPrice     Int // snapshot at add-time, minor units
+  discountType  DiscountType @default(percent)
+  discountValue Float        @default(0)
+  lineTotal     Int          @default(0)
+  sortOrder     Int          @default(0)
+
+  @@index([quoteId])
+}
+
+model ApprovalRule {
+  id           String            @id @default(cuid())
+  name         String
+  // simple v1 condition: total discount fraction above which approval is required
+  thresholdPct Float
+  approverRole String
+  active       Boolean           @default(true)
+  requests     ApprovalRequest[]
+}
+
+model ApprovalRequest {
+  id         String         @id @default(cuid())
+  quote      Quote          @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  quoteId    String
+  rule       ApprovalRule   @relation(fields: [ruleId], references: [id])
+  ruleId     String
+  status     ApprovalStatus @default(pending)
+  approverId String?
+  decidedAt  DateTime?
+  comment    String?
+  createdAt  DateTime       @default(now())
+
+  @@index([quoteId])
+  @@index([status])
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  quote     Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  quoteId   String
+  actorId   String?
+  type      String
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([quoteId])
+}

@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+.pnp.*
+
+# builds
+dist/
+build/
+.next/
+out/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# prisma
+packages/db/prisma/*.db
+packages/db/prisma/migrations/dev.db*
+
+# jspr generated output: only the token CSS is imported (committed). The
+# component CSS + TS manifests are unused byproducts of `npm run tokens`
+# (the design system ships those itself), so they're regenerated, not committed.
+apps/web/src/generated/components/
+apps/web/src/generated/ts/
+
+# logs / os / editor
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+coverage/
+.turbo/
+*.tsbuildinfo

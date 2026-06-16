@@ -1,0 +1,33 @@
+{
+  "name": "@tactik/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "tokens": "jspr gen tokens && rm -rf src/generated/components src/generated/ts"
+  },
+  "dependencies": {
+    "@jasperlepardo/base-design-system": "^0.4.1",
+    "@tactik/db": "*",
+    "@tactik/pricing": "*",
+    "@tactik/shared": "*",
+    "next": "^15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "style-dictionary": "^4.4.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3"
+  }
+}

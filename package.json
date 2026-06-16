@@ -1,0 +1,26 @@
+{
+  "name": "tactik",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tactik — Revenue Lifecycle Management platform (CPQ module)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@tactik/web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:generate": "npm run generate --workspace=@tactik/db",
+    "db:migrate": "npm run migrate --workspace=@tactik/db",
+    "tokens": "npm run tokens --workspace=@tactik/web"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

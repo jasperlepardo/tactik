@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Design-system base styles (components + Tailwind preflight) and the
+   @theme var→utility mapping (raw → primitives → semantics → components). */
+@import "@jasperlepardo/base-design-system/styles";
+@import "@jasperlepardo/base-design-system/theme";
+
+/* Tactik token overrides — generated from apps/web/jspr.config.mjs via
+   `npx jspr gen tokens`. Imported LAST so these :root / [data-theme] values
+   win over the package's base tokens. Regenerate after editing jspr.config. */
+@import "../generated/tokens/base.css";
+@import "../generated/tokens/theme-light.css";
+@import "../generated/tokens/theme-dark.css";
+@import "../generated/tokens/theme-auto-dark.css";
