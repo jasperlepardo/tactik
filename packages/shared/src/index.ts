@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export * from "./catalog.js";
+
 /**
  * Shared domain types for the CPQ module.
  * These mirror the §6 data model in docs/prd/cpq-module.md and are the single
